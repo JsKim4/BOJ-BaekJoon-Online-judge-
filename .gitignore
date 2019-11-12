@@ -1,5 +1,6 @@
-!src*
+!java*
 !*.class
-bin*
+bin/*
 .project
 .classpath
+*.java
