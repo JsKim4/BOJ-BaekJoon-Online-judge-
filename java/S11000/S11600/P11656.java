@@ -14,8 +14,6 @@ public class P11656 {
 			s[i]=a.substring(i,a.length());
 		}
 		
-		
-		
 		Arrays.sort(s);
 		for(int i=0;i<a.length();i++) {
 			System.out.println(s[i]);
