@@ -9,6 +9,7 @@ public class P1300 {
 			n*=2;
 		}
 		return n;
+		
 	}
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
