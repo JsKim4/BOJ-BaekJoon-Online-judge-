@@ -2,7 +2,7 @@ package S2000.S2100;
 
 import java.util.Arrays;
 import java.util.Scanner;
-
+// 2110 공유기 설치
 public class P2110 {
 	int temp[] = new int[200001];
 	static int arr[];
