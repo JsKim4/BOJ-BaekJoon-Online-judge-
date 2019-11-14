@@ -1,8 +1,8 @@
 package S1000.S1300;
 
 import java.util.Scanner;
-// 1300 2진수 8진수
-public class P1300 {
+// 1373 2진수 8진수
+public class P1373 {
 	public static int mul(int num) {
 		int n=1;
 		for(int i=1;i<num;i++) {
