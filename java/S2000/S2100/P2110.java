@@ -1,41 +1,11 @@
 package S2000.S2100;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class P2110 {
 	int temp[] = new int[200001];
 	static int arr[];
-
-	public void merge(int left, int right) {
-		int mid = (left + right) / 2;
-		int l = left;
-		int r = mid + 1;
-		int k = l;
-		while (l != mid + 1 && r != right + 1) {
-			if (arr[l] < arr[r])
-				temp[k++] = arr[l++];
-			else
-				temp[k++] = arr[r++];
-		}
-		for (; k <= right; k++) {
-			temp[k] = arr[l++];
-		}
-		for (k = left; k <= right; k++) {
-			arr[k] = temp[k];
-		}
-	}
-
-	public void mergeSort(int left, int right) {
-		int mid = (left + right) / 2;
-		if (left == right)
-			return;
-		mergeSort(left, mid);
-		mergeSort(mid + 1, right);
-
-		merge(left, right);
-
-	}
-
 	public boolean search(int count,int len) {
 		int snum=arr[0];
 		int index=0;
@@ -80,12 +50,10 @@ public class P2110 {
 		for (int i = 0; i < n; i++) {
 			arr[i] = sc.nextInt();
 		}
-		p.mergeSort(0, n - 1);
+		Arrays.sort(arr);
 		int minLen = 1;
 		int len = arr[arr.length-1] - arr[0];
 		int maxLen = arr[arr.length-1] - arr[0];
-		int left = 0;
-		int right = arr.length-1;
 		while(true) {
 			//System.out.println(len+" "+maxLen+" "+minLen);
 			if(p.search(m,maxLen)) {
