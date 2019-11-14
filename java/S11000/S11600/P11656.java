@@ -3,6 +3,7 @@ package S11000.S11600;
 import java.util.Arrays;
 import java.util.Scanner;
 
+//11656 접미사 배열
 public class P11656 {
 	public static void main(String[] args) {
 		String a;
