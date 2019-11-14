@@ -2,7 +2,7 @@ package S2000.S2100;
 
 import java.util.Arrays;
 import java.util.Scanner;
-// 2110 °øÀ¯±â ¼³Ä¡
+// 2110 ê³µìœ ê¸°ì„¤ì¹˜
 public class P2110 {
 	int temp[] = new int[200001];
 	static int arr[];
