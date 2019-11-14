@@ -2,7 +2,7 @@ package S1000.S1900;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
+// 1992 쿼드트리
 public class P1992 {
 	String line[];
 	public void solve() throws Exception{
