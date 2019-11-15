@@ -5,7 +5,7 @@ using namespace std;
 int list[100001];
 vector<int> passCount;
 vector<int> passLoad;
-// 10451
+// 9466
 int check(int nowN,int count) {
 	//printf("%d %d\n",nowN,count);
 	passLoad.push_back(nowN);
