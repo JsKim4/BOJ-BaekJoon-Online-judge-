@@ -3,6 +3,7 @@
 #pragma warning(disable:4996)
 using namespace std;
 int dp[300000];
+// 2231
 int cal(int n,int p){
 	int result = 0;
 	result += pow(n % 100000 / 10000, p);
