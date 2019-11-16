@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-// 2178
+// 2178 미로 탐색
 public class P2178 {
 	int n, m;
 	int list[][];
