@@ -1,7 +1,7 @@
 package S6000.S6600;
 
 import java.util.Scanner;
-
+// 6603 로또
 public class P6603 {
 	static final int maxC = 6;
 	int arr[] = new int[13];
