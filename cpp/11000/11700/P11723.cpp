@@ -4,6 +4,7 @@ using namespace std;
 // 11723 집합
 char order[][10] = { "add","remove","check","toggle","all","empty" };
 int o[22] = {0b0,0b1};
+
 int main() {
 	int M; scanf("%d",&M);
 	char ord[10];
