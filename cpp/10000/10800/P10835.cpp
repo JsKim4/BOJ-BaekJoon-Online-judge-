@@ -1,4 +1,5 @@
 #include<iostream>
+<<<<<<< HEAD
 #pragma warning (disable:4996)
 using namespace std;
 // 10835 카드게임
@@ -26,11 +27,33 @@ void dp(int l,int r, int num) {
 			dp(l + 1, r + 1, num);
 		}
 	}
+=======
+#include <algorithm>
+#pragma warning (disable:4996)
+using namespace std;
+// 10835 카드게임
+int dp[2000][2000];
+int R[2000]; int L[2000];
+int n;
+int c = 0;
+int solve(int l, int r) {
+	c++;
+	//printf("%d %d %d\n",l,r,dp[l][r]);
+	if (l == n || r == n)
+		return 0;
+	if (dp[l][r] != -1)
+		return dp[l][r];
+	dp[l][r] = max(solve(l+1,r),solve(l+1,r+1));
+	if (L[l] > R[r]) 
+		dp[l][r] = max(dp[l][r],R[r]+solve(l,r+1));
+	return dp[l][r];
+>>>>>>> 634fbc2312be26a2e15cc64f37128fb8aa4815a0
 }
 int main() {
 	scanf("%d", &n);
 	for (int i = 0; i < n; i++) scanf("%d", &L[i]);
 	for (int i = 0; i < n; i++) scanf("%d", &R[i]);
+<<<<<<< HEAD
 	for (int i = 0; i < n; i++) m[i] = -1;
 	dp(0, 0, 0);
 	int mx = 0;
@@ -39,3 +62,11 @@ int main() {
 			mx = m[i];        
 	printf("%d", mx);
 }              
+=======
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n;j++) {
+			dp[i][j] = -1;
+		}
+	printf("%d", solve(0, 0));
+}
+>>>>>>> 634fbc2312be26a2e15cc64f37128fb8aa4815a0
