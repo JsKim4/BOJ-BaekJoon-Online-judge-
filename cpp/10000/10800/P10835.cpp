@@ -1,0 +1,41 @@
+#include<iostream>
+#pragma warning (disable:4996)
+using namespace std;
+// 10835 카드게임
+int m[2000];
+int R[2000]; int L[2000];
+int n;
+int c = 0;
+void dp(int l,int r, int num) {
+	c++;
+	if (l == n || r == n)
+		return;
+	if (R[r] < L[l]) {
+		if (num + R[r] > m[l]) {
+			m[l] = num + R[r];
+			dp(l, r + 1, num + R[r]);
+		}
+		else
+			return;
+	}
+	else {
+		if (m[l+1] == -1) {
+			if(m[l]<num)
+				m[l] = num;
+			dp(l + 1, r, num);
+			dp(l + 1, r + 1, num);
+		}
+	}
+}
+int main() {
+	scanf("%d", &n);
+	for (int i = 0; i < n; i++) scanf("%d", &L[i]);
+	for (int i = 0; i < n; i++) scanf("%d", &R[i]);
+	for (int i = 0; i < n; i++) m[i] = -1;
+	dp(0, 0, 0);
+	int mx = 0;
+	for (int i = 0; i < n;i++)
+		if (mx < m[i])
+			mx = m[i];        
+	printf("%d", mx);
+}              
