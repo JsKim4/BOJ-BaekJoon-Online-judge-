@@ -5,8 +5,6 @@
 using namespace std;
 // 2014 소수의 곱
 int sq[100];
-int len[100];
-int lena[100][100];
 int main() {
 	int k, n;
 	priority_queue<long long>answer;
@@ -16,7 +14,6 @@ int main() {
 		cin >> sq[i];
 		tq.push({ sq[i],i });
 		answer.push(sq[i]);
-		len[i] = 1;
 	}
 	while (!tq.empty()) {
 		long long tnum = tq.front().first;
