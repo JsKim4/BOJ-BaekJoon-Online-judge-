@@ -6,7 +6,7 @@ using namespace std;
 vector<int> eArray[20000];
 vector<int> vArray;
 int v, e;
-// 1707
+// 1707 이분 그래프
 bool dfs(int n, int p) {
 	vArray[n] = p;
 	p = p == 1 ? 2 : 1;
