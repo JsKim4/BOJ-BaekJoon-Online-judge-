@@ -53,18 +53,13 @@ void bruteForce(int i) {
 			}
 			if (out == 3) {
 				out = 0;
+				for (int g = 3; g >= 0; g--)
+					ground[g] = 0;
 				K++;
 			}
 		}
 		if (score > _max) {
 			_max = score;
-			cout << " " << _max << endl;
-			for (int ii = 0; ii < N; ii++) {
-				for (int jj = 0; jj < 9; jj++) {
-					cout << m[ii][jj];
-				}
-				cout << endl;
-			}
 		}
 		return;
 	}
