@@ -5,13 +5,10 @@
 using namespace std;
 // 17822 원판돌리기
 deque<int>pan[50];
-queue<pair<int, int>> tempq;
 int n, m, t;
 int way[][2] = { {0,1},{0,-1},{1,0},{-1,0} };
 bool cc;
 int numn;
-int ii;
-int jj;
 int iii;
 int jjj;
 bool avail(int i,int j) {
@@ -42,11 +39,12 @@ void print() {
 	}
 }
 bool remove(int i,int j) {
+	queue<pair<int, int>> tempq;
 	numn = pan[i][j];
 	cc = false;
 	for (int w = 0; w < 4; w++) {
-		ii = i + way[w][0];
-		jj = j + way[w][1];
+		int ii = i + way[w][0];
+		int jj = j + way[w][1];
 		
 		if (jj == -1) 
 			jj = m - 1;
@@ -61,12 +59,12 @@ bool remove(int i,int j) {
 	if (!cc)
 		return false;
 	tempq.push(make_pair(i, j));
+	pan[i][j] = 0;
 	while (!tempq.empty()) {
 		int len = tempq.size();
 		for (int z = 0; z < len; z++) {
-			ii = tempq.front().first;
-			jj = tempq.front().second;
-			pan[ii][jj] = 0;
+			int ii = tempq.front().first;
+			int jj = tempq.front().second;
 			tempq.pop();
 			for (int w = 0; w < 4;w++) {
 				iii = ii + way[w][0];
@@ -78,6 +76,7 @@ bool remove(int i,int j) {
 					jjj = 0;
 				
 				if (avail(iii, jjj) && pan[iii][jjj] == numn) {
+					pan[iii][jjj] = 0;
 					tempq.push(make_pair(iii,jjj));
 				}
 			}
