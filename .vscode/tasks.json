@@ -11,7 +11,6 @@
             "command": "g++",
             "args": [
                 "${file}",
-                "-g",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],
@@ -43,7 +42,6 @@
             "command": "gcc",
             "args": [
                 "${file}",
-                "-g",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],
@@ -80,11 +78,9 @@
         // Excute binary (Windows)
         {
             "label": "execute",
-            "command": "cmd",
-            "group": "test",
-            "args": [
-                "/C",
-                "${fileDirname}\\${fileBasenameNoExtension}"
-            ]
+            "command":"cd ${fileDirname} && ./${fileBasenameNoExtension}",
+            "group": "test"
         }
+    ]
+}
    
