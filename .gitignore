@@ -3,5 +3,3 @@ bin/*
 .project
 .classpath
 *.class
-*
-!*.cpp
