@@ -5,232 +5,256 @@ import java.util.stream.Collectors;
 
 public class P19238 {
     public static void main(String[] args) {
-        new P19238().solve();
+        try {
+            new P19238().solve();
+        } catch (RuntimeException e) {
+            //e.printStackTrace();
+            System.out.println(-1);
+        }
     }
 
-    private void solve() {
+    private void solve() throws RuntimeException {
         Scanner sc = new Scanner(System.in);
         String[] orders = sc.nextLine().split(" ");
         int n = Integer.parseInt(orders[0]);
         int m = Integer.parseInt(orders[1]);
         int fuel = Integer.parseInt(orders[2]);
-        boolean indexArray[] = new boolean[m];
         MapItem[][] map = new MapItem[n][n];
         for (int i = 0; i < n; i++) {
             String[] mapLine = sc.nextLine().split(" ");
             for (int j = 0; j < n; j++) {
-                map[i][j] = new MapItem(Integer.parseInt(mapLine[j]));
+                map[i][j] = new MapItem(Integer.parseInt(mapLine[j]), i, j);
             }
         }
 
         String[] s = sc.nextLine().split(" ");
-        int sy = Integer.parseInt(s[0]) - 1;
-        int sx = Integer.parseInt(s[1]) - 1;
+        FuelStore fuelStore = new FuelStore(fuel);
+        StartTaxi startTaxi = new StartTaxi(Integer.valueOf(s[0]) - 1, Integer.valueOf(s[1]) - 1, 0, TaxiState.NONE, 0);
         for (int i = 0; i < m; i++) {
-            List<Integer> list = Arrays.asList(sc.nextLine().split(" ")).stream().map(Integer::parseInt).collect(Collectors.toList());
-            map[list.get(0) - 1][list.get(1) - 1].addItem(i, ItemType.START);
-            map[list.get(2) - 1][list.get(3) - 1].addItem(i, ItemType.END);
+            List<Integer> inputs = Arrays.asList(sc.nextLine().split(" ")).stream().map(Integer::parseInt).collect(Collectors.toList());
+            int sy = inputs.get(0) - 1;
+            int sx = inputs.get(1) - 1;
+            int ey = inputs.get(2) - 1;
+            int ex = inputs.get(3) - 1;
+            map[sy][sx].passengerIndex = i + 1;
+            map[ey][ex].addGoalIndexes(i + 1);
         }
+        while (m > 0) {
 
-        ItemType nowType = ItemType.END;
-
-        int index = -1;
-        while (true) {
-            int now = 0;
-            Queue<Taxi> taxiQueue = new ArrayDeque<>();
-            Item nowItem = new Item(index, nowType);
-            taxiQueue.add(new Taxi(sy, sx, nowType));
-            boolean success = false;
-            if (map[sy][sx].visit(now, index, nowType)) {
-                index = map[sy][sx].getAndPollNowVisitIndex();
-                nowType = ItemType.START;
-                continue;
+            StartTaxi nextTaxi = getStartTaxi(startTaxi, map);
+            //System.out.println(nextTaxi);
+            if (startTaxi.nowState == nextTaxi.nowState)
+                throw new RuntimeException();
+            if (startTaxi.nowState == TaxiState.NONE) {
+                fuelStore.rideOnFuel(nextTaxi.useFuel);
+            } else {
+                fuelStore.takeOffFuel(nextTaxi.useFuel);
+                m--;
             }
-            while (taxiQueue.isEmpty() == false) {
-                List<Taxi> availStatTaxi = new ArrayList<>();
-                int len = taxiQueue.size();
-                while (len-- > 0) {
-                    Taxi taxi = taxiQueue.poll();
-                    List<Taxi> taxis = taxi.availMoveTaxi(map, n);
-                    for (Taxi taxiItem : taxis) {
-                        if (map[taxiItem.getY()][taxiItem.getX()].visit(now, nowItem.index, nowItem.itemType)) {
-                            availStatTaxi.add(taxiItem);
-                        }
-                        taxiQueue.add(taxiItem);
-                    }
-                }
-                now++;
-                if (availStatTaxi.isEmpty() == false) {
-
-                    fuel -= now;
-                    if (fuel < 0) {
-                        System.out.println(-1);
-                        return;
-                    }
-
-                    availStatTaxi.sort(Taxi::compareTo);
-                    sy = availStatTaxi.get(0).location.first;
-                    sx = availStatTaxi.get(0).location.second;
-
-                    if (nowType == ItemType.START) {
-                        indexArray[index] = true;
-                        nowType = ItemType.END;
-                        fuel += now * 2;
-                        index = -1;
-                        map[sy][sx].removeIndex(index);
-                    } else{
-                        index = map[sy][sx].getAndPollNowVisitIndex();
-                        nowType = ItemType.START;
-                    }
-                    success = true;
-                    break;
-                }
-            }
-            if (success == false) {
-                break;
-            }
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
+            startTaxi = nextTaxi;
+            startTaxi.useFuel = 0;
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[i].length; j++) {
                     map[i][j].init();
                 }
             }
+        }
+        System.out.println(fuelStore.nowFuel);
 
-        }
-        for (boolean isTrue : indexArray) {
-            if (isTrue == false) {
-                System.out.println(-1);
-                return;
-            }
-        }
-        System.out.println(fuel);
+
     }
 
-    class Taxi implements Comparable<Taxi> {
-        Pair location;
-        ItemType nowType;
-
-        private final int[][] way = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
-        public Taxi(int y, int x, ItemType nowType) {
-            location = new Pair(y, x);
-            this.nowType = nowType;
-        }
-
-        @Override
-        public int compareTo(Taxi o) {
-            int first = location.first - o.location.first;
-            if (first != 0)
-                return first;
-
-            return location.second - o.location.second;
-        }
-
-        public List<Taxi> availMoveTaxi(MapItem[][] map, int n) {
-            List<Taxi> taxis = new ArrayList<>();
-            for (int[] w : way) {
-                int wy = location.first + w[0];
-                int wx = location.second + w[1];
-
-                if (moveAvail(wy, wx, n) && map[wy][wx].isAvail()) {
-                    taxis.add(new Taxi(wy, wx, nowType));
+    private StartTaxi getStartTaxi(StartTaxi startTaxi, MapItem[][] map) {
+        int fuel = 0;
+        Queue<MapItem> q = new ArrayDeque<>();
+        q.add(map[startTaxi.y][startTaxi.x]);
+        map[startTaxi.y][startTaxi.x].visitCount = 0;
+        if (startTaxi.nowState == TaxiState.NONE) {
+            if (map[startTaxi.y][startTaxi.x].isPassenger()) {
+                int index = map[startTaxi.y][startTaxi.x].passengerIndex;
+                if (map[startTaxi.y][startTaxi.x].ride()) {
+                    return new StartTaxi(startTaxi.y, startTaxi.x, index, TaxiState.RIDE, fuel);
                 }
             }
-            return taxis;
         }
 
-        private boolean moveAvail(int y, int x, int n) {
-            if (y >= 0 && y < n && x >= 0 && x < n)
-                return true;
+        while (q.isEmpty() == false) {
+            int len = q.size();
+            List<StartTaxi> list = new ArrayList<>();
+            while (len-- > 0) {
+                MapItem mapItem = q.poll();
+                for (int w = 0; w < 4; w++) {
+                    if (mapItem.moveAvail(w, map)) {
+                        MapItem moveMapItem = mapItem.move(w, map, fuel + 1);
+                        if (moveMapItem.y == 2 && moveMapItem.x == 1) {
+                            ;
+                        }
+                        if (startTaxi.nowState == TaxiState.NONE) {
+                            if (moveMapItem.isPassenger()) {
+                                int index = moveMapItem.passengerIndex;
+                                list.add(new StartTaxi(moveMapItem.y, moveMapItem.x, index, TaxiState.RIDE, fuel + 1));
+                            }
+                        }
+                        if (startTaxi.nowState == TaxiState.RIDE) {
+                            if (moveMapItem.isGoal(startTaxi.index)) {
+                                moveMapItem.takeOff(startTaxi.index);
+                                return new StartTaxi(moveMapItem.y, moveMapItem.x, 0, TaxiState.NONE, fuel + 1);
+                            }
+                        }
+                        q.add(moveMapItem);
+                    }
+                }
+            }
+            list.sort((o1, o2) -> {
+                int row = o1.y - o2.y;
+                if (row == 0)
+                    return o1.x - o2.x;
+                return row;
+            });
+            if (list.isEmpty() == false) {
+                map[list.get(0).y][list.get(0).x].ride();
+                return list.get(0);
+            }
+            fuel++;
+        }
+
+        return startTaxi;
+    }
+
+
+    private class FuelStore {
+        int nowFuel;
+
+        public FuelStore(int nowFuel) {
+            this.nowFuel = nowFuel;
+        }
+
+        public void rideOnFuel(int fuel) {
+            nowFuel -= fuel;
+            if (fuel < 0)
+                throw new RuntimeException();
+        }
+
+        public void takeOffFuel(int fuel) {
+            if(nowFuel < fuel)
+                throw new RuntimeException();
+            nowFuel += fuel;
+        }
+    }
+
+    private class StartTaxi {
+        @Override
+        public String toString() {
+            return "StartTaxi{" +
+                    "y=" + y +
+                    ", x=" + x +
+                    ", index=" + index +
+                    ", useFuel=" + useFuel +
+                    ", nowState=" + nowState +
+                    '}';
+        }
+
+        int y;
+        int x;
+        int index;
+        int useFuel;
+        TaxiState nowState;
+
+        public StartTaxi(int y, int x, int index, TaxiState nowState, int useFuel) {
+            this.y = y;
+            this.x = x;
+            this.index = index;
+            this.nowState = nowState;
+            this.useFuel = useFuel;
+        }
+    }
+
+    private static class MapItem {
+        boolean isWall;
+        int passengerIndex;
+        int visitCount = -1;
+        int y;
+        int x;
+        List<Integer> goalIndexes = new ArrayList<>();
+
+        @Override
+        public String toString() {
+            return "MapItem{" +
+                    "isWall=" + isWall +
+                    ", passengerIndex=" + passengerIndex +
+                    ", visitCount=" + visitCount +
+                    ", y=" + y +
+                    ", x=" + x +
+                    ", goalIndexes=" + goalIndexes +
+                    '}';
+        }
+
+        private final static int way[][] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+        public MapItem(int n, int y, int x) {
+            this.isWall = n == 1;
+            this.y = y;
+            this.x = x;
+        }
+
+        public boolean isPassenger() {
+            return passengerIndex != 0;
+        }
+
+        public void addGoalIndexes(int index) {
+            goalIndexes.add(index);
+        }
+
+        public boolean isGoal(int index) {
+            return goalIndexes.isEmpty() == false && goalIndexes.contains(index);
+        }
+
+        public boolean isVisit() {
+            return visitCount == -1 && isWall == false;
+        }
+
+        public boolean ride() {
+            if (isPassenger() == false)
+                return false;
+            passengerIndex = 0;
+            return true;
+        }
+
+        public boolean takeOff(int index) {
+            if (goalIndexes.contains(index)) {
+                for (int i = 0; i < goalIndexes.size(); i++) {
+                    if (index == goalIndexes.get(i)) {
+                        goalIndexes.remove(i);
+                        return true;
+                    }
+                }
+            }
             return false;
         }
-
-        public int getX() {
-            return location.second;
-        }
-
-        public int getY() {
-            return location.first;
-        }
-
-    }
-
-    class Pair {
-        int first;
-        int second;
-
-        public Pair(int first, int second) {
-            this.first = first;
-            this.second = second;
-        }
-
-
-    }
-
-    class MapItem {
-        int now;
-        boolean isWall;
-        List<Item> items;
 
         public void init() {
-            int n = 0;
+            visitCount = -1;
         }
 
-        public void removeIndex(int index) {
-            Item item = items.stream().filter(i -> i.itemType == ItemType.END && i.index == index).findFirst().get();
-            items.remove(item);
-        }
-
-        public int getAndPollNowVisitIndex() {
-            Item item = items.stream().filter(i -> i.itemType == ItemType.START).findFirst().get();
-            items.remove(item);
-            return item.index;
-        }
-
-        public boolean visit(int now, int index, ItemType itemType) {
-            this.now = now;
-            if (itemType == ItemType.END) {
-                boolean b = items.stream().anyMatch(i -> i.itemType == ItemType.START);
-                return b;
-            } else {
-                boolean b = items.stream().anyMatch(i -> i.index == index && i.itemType == ItemType.END);
-                return b;
-            }
-        }
-
-        public MapItem(int n) {
-            now = -1;
-            if (n == 1) {
-                isWall = true;
-            } else {
-                isWall = false;
-            }
-            items = new ArrayList<>();
-        }
-
-        public boolean isAvail() {
-            if (now == -1 && isWall == false) {
+        public boolean moveAvail(int w, MapItem[][] map) {
+            int len = map.length;
+            int wy = y + way[w][0];
+            int wx = x + way[w][1];
+            if (wy >= 0 && wy < len && wx >= 0 && wx < len && map[wy][wx].isVisit()) {
                 return true;
             }
             return false;
-
         }
 
-        public void addItem(int index, ItemType itemType) {
-            items.add(new Item(index, itemType));
-        }
-    }
-
-    class Item {
-        int index;
-        ItemType itemType;
-
-        public Item(int index, ItemType itemType) {
-            this.index = index;
-            this.itemType = itemType;
+        public MapItem move(int w, MapItem[][] map, int count) {
+            int wy = y + way[w][0];
+            int wx = x + way[w][1];
+            map[wy][wx].visitCount = count;
+            return map[wy][wx];
         }
     }
 
-    private enum ItemType {
-        START, END
+    private enum TaxiState {
+        RIDE, NONE
     }
 }
